@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nju.citix.dao.fund.FundMapper">
+    <resultMap id="BaseResultMap" type="nju.citix.po.Fund">
+        <id column="fund_id" jdbcType="INTEGER" property="fundId"/>
+        <result column="fund_code" jdbcType="CHAR" property="fundCode"/>
+        <result column="fund_name" jdbcType="VARCHAR" property="fundName"/>
+        <result column="abbreviation" jdbcType="VARCHAR" property="abbreviation"/>
+        <result column="pinyin" jdbcType="VARCHAR" property="pinyin"/>
+        <result column="start_time" jdbcType="DATE" property="startTime"/>
+        <result column="type" jdbcType="CHAR" property="type"/>
+        <result column="scale" jdbcType="DECIMAL" property="scale"/>
+        <result column="manager_company" jdbcType="VARCHAR" property="managerCompany"/>
+        <result column="manager_bank" jdbcType="VARCHAR" property="managerBank"/>
+        <result column="fund_history" jdbcType="LONGVARCHAR" property="fundHistory"/>
+        <result column="invest_type" jdbcType="VARCHAR" property="investType"/>
+        <result column="target" jdbcType="VARCHAR" property="target"/>
+        <result column="min_purchase_amount" jdbcType="DECIMAL" property="minPurchaseAmount"/>
+        <result column="fund_range" jdbcType="LONGVARCHAR" property="fundRange"/>
+        <result column="min_part" jdbcType="DECIMAL" property="minPart"/>
+        <result column="manager" jdbcType="VARCHAR" property="manager"/>
+        <result column="manager_link" jdbcType="VARCHAR" property="managerLink"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+    </resultMap>
+
+    <resultMap id="FundNetValue" type="nju.citix.po.FundNetValue">
+        <id column="fund_id" jdbcType="INTEGER" property="fundId"/>
+        <result column="trading_time" jdbcType="DATE" property="tradingTime"/>
+        <result column="latest_value" jdbcType="DECIMAL" property="latestValue"/>
+        <result column="daily_return" jdbcType="DECIMAL" property="dailyReturn"/>
+        <result column="weekly_return" jdbcType="DECIMAL" property="weeklyReturn"/>
+        <result column="monthly_return" jdbcType="DECIMAL" property="monthlyReturn"/>
+        <result column="three_months_return" jdbcType="DECIMAL" property="threeMonthsReturn"/>
+    </resultMap>
+
+    <resultMap id="FundBuyRateMap" type="nju.citix.po.FundBuyRate">
+        <id column="fund_id" jdbcType="INTEGER" property="fundId"/>
+        <result column="description_type" jdbcType="INTEGER" property="descriptionType"/>
+        <result column="start_amount" jdbcType="INTEGER" property="startAmount"/>
+        <result column="rate" jdbcType="DECIMAL" property="rate"/>
+    </resultMap>
+
+    <resultMap id="FundOutMap" type="nju.citix.po.FundOut">
+        <id column="fund_id" jdbcType="INTEGER" property="fundId"/>
+        <result column="start_days" jdbcType="INTEGER" property="startDays"/>
+        <result column="rate" jdbcType="DECIMAL" property="rate"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        fund_id,
+            fund_code,
+            fund_name,
+            abbreviation,
+            pinyin,
+            start_time,
+            `type`,
+            `scale`,
+            manager_company,
+            manager_bank,
+            fund_history,
+            invest_type,
+            target,
+            min_purchase_amount,
+            fund_range,
+            min_part,
+            manager,
+            manager_link,
+            url
+    </sql>
+
+    <insert id="insert" keyColumn="fund_id" keyProperty="fundId" parameterType="nju.citix.po.Fund"
+            useGeneratedKeys="true">
+        insert into fund (fund_code, min_purchase_amount, min_part, url)
+        values (#{fundCode,jdbcType=CHAR}, #{minPurchaseAmount,jdbcType=DECIMAL}, #{minPart,jdbcType=DECIMAL},
+                #{url,jdbcType=VARCHAR})
+    </insert>
+
+    <insert id="insertRecommendList" parameterType="nju.citix.po.Recommend">
+        insert into
+        recommend(customer_id, fund_code)
+        values
+        <foreach collection="recommendList" item="rec" separator=",">
+            (#{rec.customerId,jdbcType=INTEGER},#{rec.fundCode,jdbcType=CHAR})
+        </foreach>
+    </insert>
+
+    <delete id="deleteRecommendList">
+        delete
+        from recommend
+    </delete>
+
+    <update id="updateByPrimaryKey" parameterType="nju.citix.po.Fund">
+        update fund
+        <set>
+            <if test="fundName != null">
+                fund_name = #{fundName,jdbcType=VARCHAR},
+            </if>
+            <if test="abbreviation != null">
+                abbreviation = #{abbreviation,jdbcType=VARCHAR},
+            </if>
+            <if test="pinyin != null">
+                pinyin = #{pinyin,jdbcType=VARCHAR},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime,jdbcType=DATE},
+            </if>
+            <if test="type != null">
+                `type` = #{type,jdbcType=CHAR},
+            </if>
+            <if test="scale != null">
+                `scale` = #{scale,jdbcType=DECIMAL},
+            </if>
+            <if test="managerCompany != null">
+                manager_company = #{managerCompany,jdbcType=VARCHAR},
+            </if>
+            <if test="managerBank != null">
+                manager_bank = #{managerBank,jdbcType=VARCHAR},
+            </if>
+            <if test="fundHistory != null">
+                fund_history = #{fundHistory,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="investType != null">
+                invest_type = #{investType,jdbcType=VARCHAR},
+            </if>
+            <if test="target != null">
+                target = #{target,jdbcType=VARCHAR},
+            </if>
+            <if test="minPurchaseAmount != null">
+                min_purchase_amount = #{minPurchaseAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="fundRange != null">
+                fund_range = #{fundRange,jdbcType=LONGVARCHAR},
+            </if>
+            <if test="minPart != null">
+                min_part = #{minPart,jdbcType=DECIMAL},
+            </if>
+            <if test="manager != null">
+                manager = #{manager,jdbcType=VARCHAR},
+            </if>
+            <if test="managerLink != null">
+                manager_link = #{managerLink,jdbcType=VARCHAR},
+            </if>
+            <if test="url != null">
+                url = #{url,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where fund_id = #{fundId,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectFundByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fund
+        where fund_id = #{fundId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectFundByCode" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fund
+        where fund_code = #{fundCode,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectAllFundByPage" resultMap="BaseResultMap">
+        select *
+        from fund
+        limit #{offset},#{rowsNum}
+    </select>
+
+    <select id="selectFundListOrderedByCodeTopTen" resultMap="BaseResultMap">
+        select *
+        from fund
+        order by fund_code desc
+        limit 10
+    </select>
+
+    <select id="selectFundNetValue" resultMap="FundNetValue">
+        select *
+        from fund_netvalue
+        where fund_id = #{fundId}
+        order by trading_time
+    </select>
+
+    <select id="selectNewestFundNetValue" resultMap="FundNetValue">
+        select *
+        from fund_netvalue
+        where fund_id = #{fundId}
+        order by trading_time desc
+        limit 1
+    </select>
+
+    <select id="selectFundBuyRateById" resultMap="FundBuyRateMap">
+        select *
+        from fund_buy_rates
+        where fund_id = #{fundId}
+        order by start_amount
+    </select>
+
+    <select id="selectFundOutById" resultMap="FundOutMap">
+        select *
+        from fund_out
+        where fund_id = #{fundId}
+        order by start_days
+    </select>
+
+    <select id="selectRecommendListByUserId" parameterType="INTEGER" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fund
+        where fund_code in
+        (
+        select recommend.fund_code
+        from recommend
+        where recommend.customer_id = #{customerId}
+        )
+        limit 10
+    </select>
+
+    <!--auto generated by MybatisCodeHelper on 2019-09-13-->
+    <select id="selectAllByFundIdIn" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from fund
+        where fund_id in
+        <foreach item="item" index="index" collection="fundIds"
+                 open="(" separator="," close=")">
+            #{item,jdbcType=INTEGER}
+        </foreach>
+
+    </select>
+
+</mapper>

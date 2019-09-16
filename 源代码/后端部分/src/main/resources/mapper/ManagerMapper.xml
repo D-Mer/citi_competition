@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nju.citix.dao.manager.ManagerMapper">
+    <resultMap id="Manager" type="nju.citix.po.Manager">
+        <id column="manager_id" jdbcType="INTEGER" property="managerId"/>
+        <result column="username" jdbcType="CHAR" property="username"/>
+        <result column="password" jdbcType="CHAR" property="password"/>
+        <result column="banned" jdbcType="BOOLEAN" property="banned"/>
+        <result column="last_login" jdbcType="TIMESTAMP" property="lastLogin"/>
+    </resultMap>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="Manager">
+        select
+        *
+        from manager
+        where manager_id = #{managerId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByUsername" resultMap="Manager">
+        select
+        *
+        from manager
+        where username=#{username}
+    </select>
+
+    <select id="selectAllByPage" resultMap="Manager">
+        select
+        *
+        from manager
+        limit #{offset},#{rowsNum}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from manager
+        where manager_id = #{managerId,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insert" keyColumn="manager_id" keyProperty="managerId" parameterType="nju.citix.po.Manager"
+            useGeneratedKeys="true">
+        insert into manager (username, `password`, banned)
+        values (#{username,jdbcType=CHAR}, #{password,jdbcType=CHAR}, #{banned,jdbcType=BOOLEAN})
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="nju.citix.po.Manager">
+        update manager
+        <set>
+            <if test="username != null">
+                username = #{username,jdbcType=CHAR},
+            </if>
+            <if test="password != null">
+                `password` = #{password,jdbcType=CHAR},
+            </if>
+            <if test="banned != null">
+                `banned` = #{banned,jdbcType=TINYINT},
+            </if>
+            <if test="lastLogin != null">
+                `last_login` = #{lastLogin,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where manager_id = #{managerId,jdbcType=INTEGER}
+    </update>
+</mapper>

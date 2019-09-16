@@ -1,0 +1,149 @@
+spring:
+  profiles:
+    active: "@profileActive@"
+  datasource:
+    url: jdbc:mysql://localhost:3306/citix?characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    time-zone: GMT+8
+  mail:
+    username: 1121057486@qq.com
+    protocol: smtp
+    default-encoding: UTF-8
+    host: smtp.qq.com
+    port: 465
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
+---
+spring:
+  profiles: prod
+  devtools:
+    add-properties: false
+  datasource:
+    password: 123456
+logging:
+  level:
+    root: info
+server:
+  port: 8081
+---
+spring:
+  profiles: test
+  devtools:
+    add-properties: true
+  datasource:
+    username: root
+    password: 123456
+logging:
+  level:
+    nju.citix: DEBUG
+
+---
+spring:
+  profiles: dwh
+  datasource:
+    password: 123456
+    hikari:
+      max-lifetime: 3600000
+  devtools:
+    add-properties: true
+server:
+  servlet:
+    session:
+      timeout: 7200
+logging:
+  level:
+    nju.citix: DEBUG
+
+---
+spring:
+  profiles: jh
+  datasource:
+    password: root
+    hikari:
+      max-lifetime: 3600000
+  devtools:
+    add-properties: true
+server:
+  servlet:
+    session:
+      timeout: 7200
+logging:
+  level:
+    nju.citix: DEBUG
+
+---
+spring:
+  profiles: zhm
+  datasource:
+    password: root
+    hikari:
+      max-lifetime: 3600000
+  devtools:
+    add-properties: true
+server:
+  servlet:
+    session:
+      timeout: 7200
+logging:
+  level:
+    nju.citix: DEBUG
+
+---
+spring:
+  profiles: yyp
+  datasource:
+    password: 123456
+    hikari:
+      max-lifetime: 3600000
+  devtools:
+    add-properties: true
+server:
+  servlet:
+    session:
+      timeout: 7200
+logging:
+  level:
+    nju.citix: DEBUG
+
+---
+spring:
+  profiles: gky
+  datasource:
+    password: root
+    hikari:
+      max-lifetime: 3600000
+  devtools:
+    add-properties: true
+server:
+  servlet:
+    session:
+      timeout: 7200
+logging:
+  level:
+    nju.citix: DEBUG
+
+---
+spring:
+  profiles: zjh
+  datasource:
+    password: 2000331Zjh
+    hikari:
+      max-lifetime: 3600000
+  devtools:
+    add-properties: true
+server:
+  servlet:
+    session:
+      timeout: 7200
+logging:
+  level:
+    nju.citix: DEBUG

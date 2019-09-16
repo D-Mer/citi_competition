@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nju.citix.dao.fund.FundCompositionMapper">
+    <resultMap id="FundCompositionItem" type="nju.citix.po.FundComposition">
+        <result column="composition_id" jdbcType="INTEGER" property="compositionId"/>
+        <result column="fund_id" jdbcType="INTEGER" property="fundId"/>
+        <result column="fund_percentage" jdbcType="DECIMAL" property="fundPercentage"/>
+        <result column="fund_share" jdbcType="DECIMAL" property="fundShare"/>
+        <result column="purchase_loss" jdbcType="DECIMAL" property="purchaseLoss"/>
+        <result column="sold_loss" jdbcType="DECIMAL" property="soldLoss"/>
+    </resultMap>
+
+
+    <insert id="insertFundCompositionItem">
+        insert into fund_composition (composition_id, fund_id, fund_percentage)
+        value (#{compositionId,jdbcType=INTEGER}, #{fundId,jdbcType=INTEGER}, #{fundPercentage,jdbcType=DECIMAL})
+    </insert>
+
+
+    <select id="selectFundCompositionByCompositionId" resultMap="FundCompositionItem">
+        select
+        *
+        from fund_composition
+        where composition_id = #{compositionId,jdbcType=INTEGER}
+    </select>
+
+
+    <update id="updateFundCompositionItem">
+        update fund_composition
+        <set>
+            <if test="fundShare != null">
+                `fund_share` = #{fundShare,jdbcType=DECIMAL},
+            </if>
+            <if test="purchaseLoss != null">
+                `purchase_loss` = #{purchaseLoss,jdbcType=DECIMAL},
+            </if>
+            <if test="soldLoss != null">
+                `sold_loss` = #{soldLoss,jdbcType=DECIMAL},
+            </if>
+        </set>
+        where composition_id = #{compositionId,jdbcType=INTEGER}
+        and fund_id = #{fundId,jdbcType=INTEGER}
+    </update>
+
+
+    <delete id="deleteFundCompositionByCompositionId">
+        delete from fund_composition
+        where composition_id = #{compositionId,jdbcType=INTEGER}
+    </delete>
+
+</mapper>

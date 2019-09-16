@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nju.citix.dao.customer.CustomerCompositionMapper">
+    <resultMap id="CompositionOfCustomer" type="nju.citix.po.CustomerComposition">
+        <id column="composition_id" jdbcType="INTEGER" property="compositionId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="purchase_amount" jdbcType="DECIMAL" property="purchaseAmount"/>
+        <result column="sold_amount" jdbcType="DECIMAL" property="soldAmount"/>
+        <result column="purchase_time" jdbcType="TIMESTAMP" property="purchaseTime"/>
+        <result column="sold_time" jdbcType="TIMESTAMP" property="soldTime"/>
+        <result column="request_time" jdbcType="TIMESTAMP" property="requestTime"/>
+    </resultMap>
+
+
+    <insert id="insertCompositionOfCustomer" keyColumn="composition_id" keyProperty="compositionId"
+            parameterType="nju.citix.po.CustomerComposition" useGeneratedKeys="true">
+        insert into customer_composition (customer_id, purchase_time)
+        values (#{customerId,jdbcType=INTEGER}, CURRENT_TIMESTAMP())
+    </insert>
+
+
+    <select id="selectCompositionOfCustomerById" resultMap="CompositionOfCustomer">
+        select
+        *
+        from customer_composition
+        where composition_id = #{compositionId,jdbcType=INTEGER}
+    </select>
+
+
+    <update id="updateCompositionOfCustomer">
+        update customer_composition
+        <set>
+            <if test="customerId != null">
+                `customer_id` = #{customerId,jdbcType=INTEGER},
+            </if>
+            <if test="purchaseAmount != null">
+                `purchase_amount` = #{purchaseAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="soldAmount != null">
+                `sold_amount` = #{soldAmount,jdbcType=DECIMAL},
+            </if>
+            <if test="purchaseTime != null">
+                `purchase_time` = #{purchaseTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="soldTime != null">
+                `sold_time` = #{soldTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="requestTime != null">
+                `request_time` = #{requestTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where composition_id = #{compositionId,jdbcType=INTEGER}
+    </update>
+
+
+    <delete id="deleteCompositionOfCustomerById">
+        delete from customer_composition
+        where composition_id = #{compositionId,jdbcType=INTEGER}
+    </delete>
+
+    <select id="selectPendingCompositions" resultMap="CompositionOfCustomer">
+        select
+        *
+        from customer_composition
+        where (request_time is not null) and sold_time is null
+    </select>
+
+</mapper>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nju.citix.dao.customer.CustomerMapper">
+    <resultMap id="BaseResultMap" type="nju.citix.po.Customer">
+        <id column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="username" jdbcType="CHAR" property="username"/>
+        <result column="password" jdbcType="CHAR" property="password"/>
+        <result column="email" jdbcType="CHAR" property="email"/>
+        <result column="email_valid" jdbcType="BOOLEAN" property="emailValid"/>
+        <result column="balance" jdbcType="DECIMAL" property="balance"/>
+        <result column="bonus" jdbcType="DECIMAL" property="bonus"/>
+        <result column="join_time" jdbcType="DATE" property="joinTime"/>
+        <result column="last_login" jdbcType="TIMESTAMP" property="lastLogin"/>
+        <result column="question_id" jdbcType="INTEGER" property="questionId"/>
+        <result column="ip" jdbcType="BIGINT" property="ip"/>
+        <result column="banned" jdbcType="BOOLEAN" property="banned"/>
+    </resultMap>
+
+    <resultMap id="QuestionnaireMap" type="nju.citix.po.Questionnaire">
+        <id column="questionnaire_id" jdbcType="INTEGER" property="questionnaireId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="score" jdbcType="INTEGER" property="score"/>
+        <result column="answers" jdbcType="CHAR" property="answers"/>
+        <result column="last_update" jdbcType="TIMESTAMP" property="lastUpdate"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+            customer_id,
+            username,
+            `password`,
+            email,
+            email_valid,
+            balance,
+            bonus,
+            join_time,
+            last_login,
+            question_id,
+            inet_ntoa(ip) as ip,
+            banned
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from customer
+        where customer_id = #{customerId,jdbcType=INTEGER} limit 1
+    </select>
+
+    <insert id="insert" keyColumn="customer_id" keyProperty="customerId" parameterType="nju.citix.po.Customer"
+            useGeneratedKeys="true">
+        insert into customer ( username, `password`,email,email_valid,balance, bonus, join_time, last_login,
+        question_id,ip, banned)
+        values (#{username,jdbcType=CHAR}, #{password,jdbcType=CHAR},#{email,jdbcType=CHAR},false,0.0,0.0,
+        CURRENT_DATE(),CURRENT_TIMESTAMP(),
+        -1,null,0)
+    </insert>
+
+    <insert id="insertQuestionnaire" keyColumn="customer_id" keyProperty="questionnaireId"
+            parameterType="nju.citix.po.Questionnaire"
+            useGeneratedKeys="true">
+        insert into questionnaire (customer_id, score, answers, last_update)
+        values (#{customerId,jdbcType=INTEGER}, #{score,jdbcType=INTEGER},#{answers,jdbcType=VARCHAR}, #{lastUpdate,jdbcType=TIMESTAMP})
+    </insert>
+
+    <insert id="updateQuestionnaire" keyColumn="customer_id" keyProperty="questionnaireId"
+            parameterType="nju.citix.po.Questionnaire">
+        update questionnaire set
+        score=#{score,jdbcType=INTEGER},
+        answers=#{answers,jdbcType=VARCHAR},
+        last_update=#{lastUpdate,jdbcType=TIMESTAMP}
+        where
+        customer_id=#{customerId,jdbcType=INTEGER}
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="nju.citix.po.Customer">
+        update customer
+        <set>
+            <if test="username != null">
+                username = #{username,jdbcType=CHAR},
+            </if>
+            <if test="password != null">
+                `password` = #{password,jdbcType=CHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=DECIMAL},email_valid=false,
+            </if>
+            <if test="emailValid != null">
+                email_valid = #{emailValid,jdbcType=DECIMAL},
+            </if>
+            <if test="balance != null">
+                balance = #{balance,jdbcType=DECIMAL},
+            </if>
+            <if test="bonus != null">
+                bonus = #{bonus,jdbcType=DECIMAL},
+            </if>
+            <if test="lastLogin != null">
+                last_login = #{lastLogin,jdbcType=TIMESTAMP},
+            </if>
+            <if test="questionId != null">
+                question_id = #{questionId,jdbcType=DECIMAL},
+            </if>
+            <if test="ip != null">
+                ip = inet_aton(#{ip,jdbcType=BIGINT}),
+            </if>
+            <if test="banned != null">
+                banned = #{banned,jdbcType=BOOLEAN},
+            </if>
+        </set>
+        where customer_id = #{customerId,jdbcType=INTEGER} limit 1
+    </update>
+
+    <select id="selectByEmail" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from customer
+        where email=#{email,jdbcType=CHAR} limit 1
+    </select>
+
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from customer
+        where username=#{username,jdbcType=CHAR}
+    </select>
+
+    <select id="selectQuestionnaireByCustomerId" resultMap="QuestionnaireMap">
+        select *
+        from questionnaire
+        where
+        customer_id=#{customerId}
+    </select>
+
+    <update id="updatePasswordByEmail">
+        update customer
+        set `password`=#{updatedPassword,jdbcType=CHAR}
+        where email=#{email,jdbcType=CHAR} limit 1
+    </update>
+
+    <select id="selectAllByPage" resultMap="BaseResultMap">
+        select *
+        from customer
+        limit #{offset},#{rowsNum}
+    </select>
+
+</mapper>

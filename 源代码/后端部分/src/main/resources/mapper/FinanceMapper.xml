@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nju.citix.dao.finance.FinanceMapper">
+    <resultMap id="FinanceRecord" type="nju.citix.po.FinanceRecord">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="customer_id" jdbcType="CHAR" property="customerId"/>
+        <result column="remark" jdbcType="CHAR" property="remark"/>
+        <result column="trade_time" jdbcType="TIMESTAMP" property="tradeTime"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="state" jdbcType="CHAR" property="state"/>
+        <result column="trade_num" jdbcType="CHAR" property="tradeNum"/>
+    </resultMap>
+
+    <resultMap id="PurchaseRecord" type="nju.citix.po.PurchaseRecord">
+        <id column="composition_id" jdbcType="INTEGER" property="compositionId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="purchase_amount" jdbcType="DECIMAL" property="purchaseAmount"/>
+        <result column="sold_amount" jdbcType="DECIMAL" property="soldAmount"/>
+        <result column="purchase_time" jdbcType="DATE" property="purchaseTime"/>
+        <result column="sold_time" jdbcType="DATE" property="soldTime"/>
+        <result column="request_time" jdbcType="DATE" property="requestTime"/>
+    </resultMap>
+
+    <resultMap id="FundComposition" type="nju.citix.po.FundComposition">
+        <id column="composition_id" jdbcType="INTEGER" property="compositionId"/>
+        <result column="fund_id" jdbcType="INTEGER" property="fundId"/>
+        <result column="fund_percentage" jdbcType="DECIMAL" property="fundPercentage"/>
+        <result column="fund_share" jdbcType="DECIMAL" property="fundShare"/>
+    </resultMap>
+
+    <resultMap id="CustomerComposition" type="nju.citix.po.CustomerComposition">
+        <id column="composition_id" jdbcType="INTEGER" property="compositionId"/>
+        <result column="customer_id" jdbcType="INTEGER" property="customerId"/>
+        <result column="purchase_amount" jdbcType="DECIMAL" property="purchaseAmount"/>
+        <result column="sold_amount" jdbcType="DECIMAL" property="soldAmount"/>
+        <result column="purchase_time" jdbcType="DATE" property="purchaseTime"/>
+        <result column="sold_time" jdbcType="DATE" property="soldTime"/>
+        <result column="request_time" jdbcType="DATE" property="requestTime"/>
+    </resultMap>
+
+    <insert id="insertRecord" keyColumn="id" keyProperty="id" parameterType="nju.citix.po.FinanceRecord"
+            useGeneratedKeys="true">
+        insert into finance_record (customer_id, trade_num, remark, amount, trade_time, state)
+        values (#{customerId,jdbcType=INTEGER}, #{tradeNum,jdbcType=CHAR}, #{remark,jdbcType=CHAR},
+        #{amount,jdbcType=DECIMAL}, #{tradeTime,jdbcType=TIMESTAMP}, #{state,jdbcType=CHAR})
+    </insert>
+
+    <select id="selectByTradeNum" resultMap="FinanceRecord">
+        select
+        *
+        from finance_record
+        where trade_num=#{tradeNum,jdbcType=CHAR}
+    </select>
+
+    <select id="selectById" resultMap="FinanceRecord">
+        select
+        *
+        from finance_record
+        where id=#{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectAllRecordByCustomerId" resultMap="FinanceRecord">
+        select
+        *
+        from finance_record
+        where customer_id=#{customerId,jdbcType=INTEGER}
+    </select>
+
+    <update id="updateCustomerBalance">
+        update customer
+        set
+        balance=balance+#{amount,jdbcType=DECIMAL}
+        where
+        customer_id=#{customerId,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateRecordSelective" parameterType="nju.citix.po.FinanceRecord">
+        update finance_record
+        <set>
+            <if test="customerId != null">
+                `customer_id` = #{customerId,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                `remark` = #{remark,jdbcType=CHAR},
+            </if>
+            <if test="tradeTime != null">
+                `trade_time` = #{tradeTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="amount != null">
+                `amount` = #{amount,jdbcType=DECIMAL},
+            </if>
+            <if test="state != null">
+                `state` = #{state,jdbcType=CHAR},
+            </if>
+            <if test="tradeNum != null">
+                `trade_num` = #{tradeNum,jdbcType=CHAR},
+            </if>
+        </set>
+        where `id` = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectCustomerCompositionById" resultMap="CustomerComposition">
+        select
+        *
+        from customer_composition
+        where composition_id=#{compositionId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectCompositionById" resultMap="FundComposition">
+        select
+        *
+        from fund_composition
+        where composition_id=#{compositionId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectPendingCompositions" resultMap="CustomerComposition">
+        select *
+        from customer_composition
+        where (request_time is not null)
+          and sold_time is null
+    </select>
+
+    <update id="updateRequestTime">
+        update customer_composition
+        set `request_time`= CURRENT_DATE()
+        where composition_id=#{compositionId,jdbcType=INTEGER} limit 1
+    </update>
+
+    <update id="updateSoldMessage">
+        update customer_composition
+        set `sold_time`= CURRENT_DATE(),sold_amount=#{soldAmount,jdbcType=DECIMAL}
+        where composition_id=#{compositionId,jdbcType=INTEGER} limit 1
+    </update>
+
+    <select id="selectPurchaseRecordsByCustomerIdInPurchaseAmount" resultMap="PurchaseRecord">
+        select *
+        from customer_composition
+        where customer_id = #{customerId}
+        order by purchase_amount DESC
+    </select>
+
+    <select id="selectPurchaseRecordsByCustomerIdInPurchaseTime" resultMap="PurchaseRecord">
+        select *
+        from customer_composition
+        where customer_id = #{customerId}
+        order by purchase_time DESC
+    </select>
+
+    <select id="selectPurchaseRecordsByCustomerIdInSoldTime" resultMap="PurchaseRecord">
+        select *
+        from customer_composition
+        where customer_id = #{customerId}
+        order by sold_time, purchase_time
+    </select>
+
+    <select id="selectPurchaseRecordByCompositionId" resultMap="PurchaseRecord">
+        select *
+        from customer_composition
+        where composition_id = #{compositionId}
+    </select>
+
+</mapper>

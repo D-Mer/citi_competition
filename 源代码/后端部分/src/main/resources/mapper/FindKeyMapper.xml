@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="nju.citix.dao.customer.FindKeyMapper">
+    <resultMap id="BaseResultMap" type="nju.citix.po.FindKey">
+        <id column="find_id" jdbcType="INTEGER" property="findId"/>
+        <result column="email" jdbcType="CHAR" property="email"/>
+        <result column="request_time" jdbcType="CHAR" property="requestTime"/>
+        <result column="used" jdbcType="BOOLEAN" property="used"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+            find_id,
+            email,
+            request_time,
+            used
+    </sql>
+
+    <insert id="insert" keyColumn="find_id" keyProperty="findId" parameterType="nju.citix.po.FindKey"
+            useGeneratedKeys="true">
+        INSERT INTO find_key (email, request_time, used)
+        VALUES (#{email,jdbcType=CHAR}, #{requestTime,jdbcType=CHAR}, FALSE)
+    </insert>
+
+    <update id="updateUsedByFindId">
+        UPDATE find_key
+        SET used= TRUE
+        WHERE find_id = #{findId,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectByEmail" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM find_key
+        WHERE (UNIX_TIMESTAMP(now())*1000-request_time) &lt;= 1800000
+        AND NOT used
+        AND email = #{email,jdbcType=CHAR} LIMIT 1
+    </select>
+
+</mapper>
